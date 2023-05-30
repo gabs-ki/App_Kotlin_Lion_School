@@ -1,5 +1,6 @@
 package br.senai.sp.jandira.lionschoolproject
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +40,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreen() {
+
+    var context = LocalContext.current
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -147,7 +152,10 @@ fun HomeScreen() {
                         )
 
                         Button(
-                            onClick = { /*TODO*/ },
+                            onClick = {
+                                val openHomeCursesActivity = Intent(context, HomeCursesActivity::class.java)
+                                context.startActivity(openHomeCursesActivity)
+                            },
                             modifier = Modifier
                                 .size(width = 140.dp, height = 50.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.yellow_lion)),
