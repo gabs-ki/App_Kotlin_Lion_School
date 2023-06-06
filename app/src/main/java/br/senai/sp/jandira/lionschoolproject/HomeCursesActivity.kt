@@ -126,7 +126,10 @@ fun HomeCurses() {
 
 
                    Button(
-                       onClick = { /*TODO*/ },
+                       onClick = {
+                           val openMainActivity = Intent(context, MainActivity::class.java)
+                           context.startActivity(openMainActivity)
+                       },
                        modifier = Modifier
                            .size(width = 42.dp, height = 40.dp),
                        colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.blue_lion)),

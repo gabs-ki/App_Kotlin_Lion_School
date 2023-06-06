@@ -1,17 +1,22 @@
 package br.senai.sp.jandira.lionschoolproject
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,7 +24,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.senai.sp.jandira.lionschoolproject.model.Aluno
+import br.senai.sp.jandira.lionschoolproject.model.AlunoLista
+import br.senai.sp.jandira.lionschoolproject.service.RetrofitFactory
 import br.senai.sp.jandira.lionschoolproject.ui.theme.LionSchoolProjectTheme
+import coil.compose.AsyncImage
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ClassActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +47,34 @@ class ClassActivity : ComponentActivity() {
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ClassActivityScreen() {
+
+    var context = LocalContext.current
+
+    var listAlunos by remember {
+        mutableStateOf(listOf<Aluno>())
+    }
+
+    var call = RetrofitFactory().getAlunoService().getAlunosPorClassAndStatus(curso = "DS", status = "Cursando")
+    call.enqueue(object : Callback<AlunoLista>{
+        override fun onResponse(
+            call: Call<AlunoLista>,
+            response: Response<AlunoLista>
+        ) {
+            listAlunos = response.body()!!.turma
+        }
+
+        override fun onFailure(
+            call: Call<AlunoLista>,
+            t: Throwable
+        ) {
+            Log.i("ds2t", "onFailure: ${t.message}")
+        }
+    })
+    
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -187,12 +224,41 @@ fun ClassActivityScreen() {
                     fontWeight = FontWeight.Bold
                 )
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                ) {
 
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(10.dp)
+            ) {
+                items(listAlunos) {
+                    Card(
+                        onClick = { /*TODO*/ },
+                        backgroundColor = colorResource(id = R.color.blue_lion),
+                        modifier = Modifier
+                            .size(width = 360.dp, height = 110.dp)
+                            .padding(8.dp),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+
+
+
+                            Text(
+                                text = it.nome,
+                                fontSize = 24.sp,
+                                color = colorResource(id = R.color.white)
+                            )
+                        }
+                    }
                 }
             }
         }
