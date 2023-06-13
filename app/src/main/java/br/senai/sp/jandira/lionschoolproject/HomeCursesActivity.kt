@@ -211,7 +211,10 @@ fun HomeCurses() {
                             .size(width = 350.dp, height = 85.dp)
                             .padding(vertical = 7.dp)
                             .clickable(enabled = true) {
-
+                                val openStudent = Intent(context, ClassActivity::class.java)
+                                openStudent.putExtra("sigla", it.sigla)
+                                openStudent.putExtra("nome", it.nome)
+                                context.startActivity(openStudent)
                             },
                         backgroundColor = colorResource(id = R.color.blue_lion),
                         shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)
@@ -228,7 +231,8 @@ fun HomeCurses() {
                                 model = it.icone,
                                 contentDescription = "Curso Icone",
                                 colorFilter = ColorFilter.tint(color = colorResource(id = R.color.white)),
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier
+                                    .size(40.dp)
                                     .padding(start = 10.dp)
                             )
 

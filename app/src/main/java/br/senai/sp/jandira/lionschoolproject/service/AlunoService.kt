@@ -17,6 +17,10 @@ interface AlunoService {
         @Query("curso") curso: String,
         @Query("status") status: String
     ): Call<AlunoLista>
+    @GET("alunos/")
+    fun getAlunosPorClass(
+        @Query("curso") curso: String
+    ): Call<AlunoLista>
 
     @GET("alunos/{matricula}")
     fun getAlunoPorMatricula(

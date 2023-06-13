@@ -1,5 +1,6 @@
 package br.senai.sp.jandira.lionschoolproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -39,7 +40,9 @@ class ClassActivity : ComponentActivity() {
         setContent {
             LionSchoolProjectTheme {
                 // A surface container using the 'background' color from the theme
-                    ClassActivityScreen()
+                    val siglaCurso = intent.getStringExtra("sigla")
+                    val nomeCurso = intent.getStringExtra("nome")
+                    ClassActivityScreen( siglaCurso.toString(), nomeCurso.toString())
 
             }
         }
@@ -48,9 +51,12 @@ class ClassActivity : ComponentActivity() {
 
 
 @OptIn(ExperimentalMaterialApi::class)
-@Preview(showBackground = true, showSystemUi = true)
+
 @Composable
-fun ClassActivityScreen() {
+fun ClassActivityScreen(
+    siglaCurso: String,
+    nomeCurso: String
+) {
 
     var context = LocalContext.current
 
@@ -58,7 +64,7 @@ fun ClassActivityScreen() {
         mutableStateOf(listOf<Aluno>())
     }
 
-    var call = RetrofitFactory().getAlunoService().getAlunosPorClassAndStatus(curso = "DS", status = "Cursando")
+    var call = RetrofitFactory().getAlunoService().getAlunosPorClass(curso = siglaCurso)
     call.enqueue(object : Callback<AlunoLista>{
         override fun onResponse(
             call: Call<AlunoLista>,
@@ -74,6 +80,8 @@ fun ClassActivityScreen() {
             Log.i("ds2t", "onFailure: ${t.message}")
         }
     })
+
+
     
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -131,7 +139,10 @@ fun ClassActivityScreen() {
 
 
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            val returnHomeCursesActivity = Intent(context, HomeCursesActivity::class.java)
+                            context.startActivity(returnHomeCursesActivity)
+                        },
                         modifier = Modifier
                             .size(width = 42.dp, height = 40.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.blue_lion)),
@@ -171,7 +182,7 @@ fun ClassActivityScreen() {
             }
 
             Text(
-                text = "DESENVOLVIMENTO DE SISTEMAS",
+                text = nomeCurso,
                 color = colorResource(id = R.color.blue_lion),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -235,13 +246,27 @@ fun ClassActivityScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(10.dp)
             ) {
+
                 items(listAlunos) {
+
+
                     Card(
-                        onClick = { /*TODO*/ },
-                        backgroundColor = colorResource(id = R.color.blue_lion),
+                        backgroundColor = if (it.status == "Cursando")
+                            Color(
+                                51, 71, 176
+                            )
+                        else
+                            Color(
+                                229, 182, 87
+                            ),
                         modifier = Modifier
                             .size(width = 360.dp, height = 110.dp)
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .clickable {
+                                val studentActivity = Intent(context, StudentActivity::class.java)
+                                studentActivity.putExtra("matriculaAluno", it.matricula)
+                                context.startActivity(studentActivity)
+                            },
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Row(
@@ -251,9 +276,13 @@ fun ClassActivityScreen() {
                         ) {
 
 
+                            AsyncImage(
+                                model = it.foto,
+                                contentDescription = ""
+                            )
 
                             Text(
-                                text = it.nome,
+                                text = it.nome.uppercase(),
                                 fontSize = 24.sp,
                                 color = colorResource(id = R.color.white)
                             )
@@ -264,3 +293,5 @@ fun ClassActivityScreen() {
         }
     }
 }
+
+
